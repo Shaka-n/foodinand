@@ -8,8 +8,7 @@ defmodule Foodinand.Repo.Migrations.SeedFoodTrucksTable do
   """
   use Ecto.Migration
 
-  alias Foodinand.{FoodTruck, FoodTrucks}
-  alias Foodinand.Repo
+  alias Foodinand.FoodTrucks.FoodTrucks
 
 
   @file_path "priv/static/data/rqzj-sfat.json"

@@ -22,6 +22,10 @@
     Repo.all(FoodTruck)
    end
 
+   @doc """
+   Retrieves a list of food trucks who's food items column contains a substring matching the input term. Defaults to 10 results.
+   """
+
    @spec get_food_trucks_by_search_term(String.t(), integer()) :: list(%FoodTruck{})
    def get_food_trucks_by_search_term(search_term, limit \\ 10) do
     wildcard_term = "%#{search_term}%"
@@ -32,6 +36,8 @@
    end
 
    @doc """
+   Retrieves a list of random food trucks. Defaults to 1.
+
    While Postgres has a random() function for randomly selecting a row, Ecto does not, so we need to use a raw query here.
    TABLESAMPLE SYSTEM will pick up 10% of the table and select a random row from within that block.
    """
@@ -61,11 +67,13 @@
    def insert_food_trucks_from_file(file_path) do
     case decode_source_file(file_path) do
       {:ok, data} ->
-        results =
           data
           |> Stream.map(&parse_keys_to_changeset(&1))
-          |> Stream.filter(fn food_truck_cs ->
-            food_truck_cs.facility_type == "Truck" && food_truck_cs.changes.status != :EXPIRED && food_truck_cs.changes.status != :SUSPEND
+          |> Stream.filter(fn fcs ->
+            if fcs.changes.applicant == "tacos y pupusas los trinos" do
+              dbg()
+            end
+            fcs.valid? == true && fcs.changes.facility_type == "Truck" && fcs.changes.status != :EXPIRED && fcs.changes.status != :SUSPEND
           end)
           |> Stream.map(fn food_truck_cs ->
             key = "food_truck_#{food_truck_cs.changes.location_id}"
@@ -73,9 +81,6 @@
           end)
           |> Enum.reduce(Multi.new(), &Multi.append/2)
           |> Repo.transaction()
-
-          dbg()
-        {:ok, results}
 
       {:error, %Jason.DecodeError{data: reason} = decode_error}->
         Logger.error("Problem encountered decoding source file: #{reason}" )
@@ -104,7 +109,7 @@
       {"location", %{"latitude" => latitude, "longitude" => longitude}} ->
         {:location, "#{latitude}, #{longitude}"}
       {"facilitytype", value} ->
-          {:facility_type, value}
+        {:facility_type, value}
       {"locationdescription", value} ->
         {:location_description, value}
       {"dayshours", value} ->
@@ -121,9 +126,8 @@
         # Need to convert remaining keys to atoms for consistency
         {String.to_atom(key), value}
         end)
-        dbg()
-      FoodTruck.changeset(%FoodTruck{}, parsed_attrs)
 
+      FoodTruck.changeset(%FoodTruck{}, parsed_attrs)
    end
 
    defp decode_source_file(file_path) do

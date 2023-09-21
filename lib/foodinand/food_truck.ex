@@ -35,6 +35,6 @@ defmodule Foodinand.FoodTruck do
   def changeset(food_truck, attrs) do
     food_truck
     |> cast(attrs, __MODULE__.__schema__(:fields))
-    |> validate_required([:location_id, :applicant, :cnn, :address, :status])
+    |> validate_required([:location_id, :applicant, :facility_type, :cnn, :address, :status])
   end
 end
