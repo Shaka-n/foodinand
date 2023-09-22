@@ -1,4 +1,7 @@
 defmodule Foodinand.FoodTruck do
+  @moduledoc """
+  Schema file for Food Trucks. Contains basic information defining Food Truck entities in the context of our app.
+  """
   use Ecto.Schema
   import Ecto.Changeset
 

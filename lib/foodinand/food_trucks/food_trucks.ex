@@ -21,7 +21,7 @@
     |> Repo.insert()
    end
 
-   @spec list_food_trucks() :: list(%FoodTruck{})
+   @spec list_food_trucks() :: list(FoodTruck.t())
    def list_food_trucks() do
     Repo.all(FoodTruck)
    end
@@ -30,7 +30,7 @@
    Retrieves a list of food trucks who's food items column contains a substring matching the input term. Defaults to 10 results.
    """
 
-   @spec get_food_trucks_by_search_term(String.t(), integer()) :: list(%FoodTruck{})
+   @spec get_food_trucks_by_search_term(String.t(), integer()) :: list(FoodTruck.t())
    def get_food_trucks_by_search_term(search_term, limit \\ 10) do
     wildcard_term = "%#{search_term}%"
      FoodTruck
@@ -45,8 +45,8 @@
    While Postgres has a random() function for randomly selecting a row, Ecto does not, so we need to use a raw query here.
    TABLESAMPLE SYSTEM will pick up 10% of the table and select a random row from within that block.
    """
-   @spec get_random_food_trucks(integer()) :: [%FoodTruck{}]
-   def get_random_food_trucks( number \\ 1) do
+   @spec get_random_food_trucks(integer()) :: [FoodTruck.t()]
+   def get_random_food_trucks(number \\ 1) do
     qry = "SELECT * FROM food_trucks TABLESAMPLE SYSTEM (10) LIMIT #{number}"
     result = Ecto.Adapters.SQL.query!(Repo, qry, [])
     Enum.map(result.rows, &Repo.load(FoodTruck, {result.columns, &1}))
@@ -67,7 +67,7 @@
    API Endpoint:
    https://data.sfgov.org/resource/rqzj-sfat.json
    """
-   @spec insert_food_trucks_from_file(String.t()) :: binary() | {binary(), module()} | {:error, %Jason.DecodeError{}}
+   @spec insert_food_trucks_from_file(String.t()) :: binary() | {binary(), module()} | {:error, Jason.DecodeError}
    def insert_food_trucks_from_file(file_path) do
     case decode_source_file(file_path) do
       {:ok, data} ->
@@ -83,7 +83,7 @@
           |> Enum.reduce(Multi.new(), &Multi.append/2)
           |> Repo.transaction()
 
-      {:error, %Jason.DecodeError{data: reason} = decode_error}->
+      {:error, %Jason.DecodeError{data: reason} = decode_error} ->
         Logger.error("Problem encountered decoding source file: #{reason}" )
         {:error, decode_error}
     end
