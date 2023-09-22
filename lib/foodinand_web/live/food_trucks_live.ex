@@ -71,7 +71,6 @@ defmodule FoodinandWeb.FoodTrucksLive do
 
   def handle_event("random-food-truck", _, socket) do
     random_food_trucks = FoodTrucks.get_random_food_trucks()
-    IO.inspect(random_food_trucks)
     {:noreply, assign(socket, :random_food_trucks, random_food_trucks)}
   end
 end

@@ -10,6 +10,10 @@
    alias Foodinand.Repo
    alias Foodinand.FoodTruck
 
+   @doc """
+   Primarily for demonstration purposes. Since we ingest food truck data directly from a download or the API,
+   there shouldn't be much call for inserting an individual record.
+   """
    @spec insert_food_truck(map()) :: {:ok, Ecto.Schema.t()} | {:error, Ecto.Changeset.t()}
    def insert_food_truck(attrs) do
     %FoodTruck{}
@@ -70,9 +74,6 @@
           data
           |> Stream.map(&parse_keys_to_changeset(&1))
           |> Stream.filter(fn fcs ->
-            if fcs.changes.applicant == "tacos y pupusas los trinos" do
-              dbg()
-            end
             fcs.valid? == true && fcs.changes.facility_type == "Truck" && fcs.changes.status != :EXPIRED && fcs.changes.status != :SUSPEND
           end)
           |> Stream.map(fn food_truck_cs ->
