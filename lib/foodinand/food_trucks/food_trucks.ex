@@ -21,6 +21,9 @@
     |> Repo.insert()
    end
 
+   @doc """
+   Used for testing and introspection, but not for displaying to users. Seeing the full list of trucks is not the value of this app.
+   """
    @spec list_food_trucks() :: list(FoodTruck.t())
    def list_food_trucks() do
     Repo.all(FoodTruck)
@@ -28,6 +31,9 @@
 
    @doc """
    Retrieves a list of food trucks who's food items column contains a substring matching the input term. Defaults to 10 results.
+
+   Normally this would have additional checks to sanitize user input against ILIKE SQL injection attacks. This is a place I
+   would have worked more on, had I more time.
    """
 
    @spec get_food_trucks_by_search_term(String.t(), integer()) :: list(FoodTruck.t())

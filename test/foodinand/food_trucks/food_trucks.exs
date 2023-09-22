@@ -80,16 +80,14 @@ defmodule Foodinand.FoodTrucksTest do
       {:ok, %{raw_attrs: raw_attrs_2, valid_attrs: valid_attrs, food_truck: food_truck}}
     end
 
-    test "parse_keys_to_changeset/1 produces valid changeset, drops keys not specified in schema", %{raw_attrs: raw_attrs} do
+    test "parse_keys_to_changeset/1 drops keys not specified in schema", %{raw_attrs: raw_attrs} do
 
       changeset = FoodTrucks.parse_keys_to_changeset(raw_attrs)
       assert changeset.valid? == true
       assert changeset.changes[":@computed_region_yftq_j783"] == nil
-      # assert 1==2
     end
 
       # Ordinarily I would keep a dataset on hand for testing the file ingestion, but in this case I think it is fine to use the real one.
-      # MAKE A FILE, WRITE SOME VALUES IN, READ FROM THE FILE, DELETE IT
     test "insert_food_trucks_from_file/1" do
       {:ok, food_trucks} = FoodTrucks.insert_food_trucks_from_file(@file_path)
       assert length(Map.keys(food_trucks)) == 262

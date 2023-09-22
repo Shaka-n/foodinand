@@ -1,14 +1,28 @@
 import Config
 
+containerized = System.get_env("CONTAINERIZED")
+
 # Configure your database
-config :foodinand, Foodinand.Repo,
-  username: "postgres",
-  password: "postgres",
-  hostname: "localhost",
-  database: "foodinand_dev",
-  stacktrace: true,
-  show_sensitive_data_on_connection_error: true,
-  pool_size: 10
+if containerized do
+  config :foodinand, Foodinand.Repo,
+    username: "postgres",
+    password: "postgres",
+    hostname: "host.docker.internal",
+    database: "foodinand_dev",
+    port: 5432,
+    stacktrace: true,
+    show_sensitive_data_on_connection_error: true,
+    pool_size: 10
+else
+  config :foodinand, Foodinand.Repo,
+    username: "postgres",
+    password: "postgres",
+    hostname: "localhost",
+    database: "foodinand_dev",
+    stacktrace: true,
+    show_sensitive_data_on_connection_error: true,
+    pool_size: 10
+end
 
 # For development, we disable any cache and enable
 # debugging and code reloading.
@@ -16,18 +30,33 @@ config :foodinand, Foodinand.Repo,
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we use it
 # with esbuild to bundle .js and .css sources.
-config :foodinand, FoodinandWeb.Endpoint,
-  # Binding to loopback ipv4 address prevents access from other machines.
-  # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
-  http: [ip: {127, 0, 0, 1}, port: 4000],
-  check_origin: false,
-  code_reloader: true,
-  debug_errors: true,
-  secret_key_base: "n8u4ihJzgsrakgU3DYI+fC4XvXuwdlmu8O1mPUdTZSa4c8ofxQULzixGzSPOpnS9",
-  watchers: [
-    esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
-    tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}
-  ]
+if containerized do
+  config :foodinand, FoodinandWeb.Endpoint,
+    # Binding to loopback ipv4 address prevents access from other machines.
+    # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
+    http: [ip: {0, 0, 0, 0}, port: 4000],
+    check_origin: false,
+    code_reloader: true,
+    debug_errors: true,
+    secret_key_base: "n8u4ihJzgsrakgU3DYI+fC4XvXuwdlmu8O1mPUdTZSa4c8ofxQULzixGzSPOpnS9",
+    watchers: [
+      esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
+      tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}
+    ]
+else
+  config :foodinand, FoodinandWeb.Endpoint,
+    # Binding to loopback ipv4 address prevents access from other machines.
+    # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
+    http: [ip: {127, 0, 0, 1}, port: 4000],
+    check_origin: false,
+    code_reloader: true,
+    debug_errors: true,
+    secret_key_base: "n8u4ihJzgsrakgU3DYI+fC4XvXuwdlmu8O1mPUdTZSa4c8ofxQULzixGzSPOpnS9",
+    watchers: [
+      esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
+      tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}
+    ]
+end
 
 # ## SSL Support
 #

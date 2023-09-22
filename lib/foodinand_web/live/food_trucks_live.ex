@@ -11,7 +11,7 @@ defmodule FoodinandWeb.FoodTrucksLive do
     <p>Discover new foods in SF! Search for a particular dish or cuisine in the bar below, or hit the random button for a random food truck!</p>
       <div class="flex flex-col pt-5">
         <h2>Feeling Lucky? Hit the button for a random SF Food Truck!</h2>
-        <button class="rounded bg-emerald-600 px-3 py-1 hover:bg-gradient-to-br from-emerald-500 to-emerald-200 w-20 mt-2 text-white font-bold" phx-click="random-food-truck">Random</button>
+        <button class="rounded bg-emerald-600 pl-1 pr-1 py-1 hover:bg-gradient-to-br from-emerald-500 to-emerald-200 w-20 mt-2 text-white font-bold" phx-click="random-food-truck">Random</button>
         <div>
             <%= for ft <- @random_food_trucks do %>
               <.food_truck_info ft={ft} />
@@ -63,7 +63,7 @@ defmodule FoodinandWeb.FoodTrucksLive do
     {:ok, socket}
   end
 
-  def handle_event("update-incremental-search", %{"search_term" => search_term}=_payload, socket) do
+  def handle_event("update-incremental-search", %{"search_term" => search_term} = _payload, socket) do
     food_truck_search_results = FoodTrucks.get_food_trucks_by_search_term(search_term, 10)
 
     {:noreply, assign(socket, :food_truck_search_results, food_truck_search_results)}

@@ -1,0 +1,41 @@
+version: '3.6'
+services:
+  db:
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DATABASE: foodinand_dev
+      POSTGRES_HOST_AUTH_METHOD: trust
+      DATABASE_PORT: 5433:5432
+    image: 'postgres:14.6-alpine'
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - '5433:5432'
+    volumes:
+      - ./Docker/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - pgdata:/var/lib/postgresql/data
+  web:
+    build: 
+      context: .
+      dockerfile: ./Dockerfile
+    restart: always
+    links:
+      - "db"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      MIX_ENV: dev
+      CONTAINERIZED: "True"
+    ports:
+      - '4000:4000'
+    volumes:
+      - .:/app
+volumes:
+  pgdata:
